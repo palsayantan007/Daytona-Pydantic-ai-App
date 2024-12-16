@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Pydantic AI Prompt Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet"/>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto py-10">
+        <h1 class="text-3xl font-bold mb-6 text-center">Pydantic AI Prompt Demo</h1>
+        <div class="max-w-md mx-auto bg-white shadow-md rounded p-6">
+            <label for="prompt" class="block text-gray-700 font-semibold mb-2">Enter your prompt:</label>
+            <textarea id="prompt" class="w-full border border-gray-300 rounded p-2 mb-4" rows="4" placeholder="Type something..."></textarea>
+            <button id="submitBtn" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Submit</button>
+            <div id="responseContainer" class="mt-4 bg-gray-50 p-4 rounded hidden">
+                <h2 class="font-bold text-gray-700 mb-2">Response:</h2>
+                <p id="responseText" class="text-gray-800"></p>
+            </div>
+            <div id="errorContainer" class="mt-4 bg-red-50 p-4 rounded hidden">
+                <h2 class="font-bold text-red-700 mb-2">Error:</h2>
+                <p id="errorText" class="text-red-800"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      const submitBtn = document.getElementById("submitBtn");
+      const promptInput = document.getElementById("prompt");
+      const responseContainer = document.getElementById("responseContainer");
+      const responseText = document.getElementById("responseText");
+      const errorContainer = document.getElementById("errorContainer");
+      const errorText = document.getElementById("errorText");
+
+      submitBtn.addEventListener("click", async () => {
+        const prompt = promptInput.value.trim();
+
+        // Hide previous results
+        responseContainer.classList.add("hidden");
+        errorContainer.classList.add("hidden");
+
+        if (!prompt) {
+          errorText.textContent = "Please enter a prompt.";
+          errorContainer.classList.remove("hidden");
+          return;
+        }
+
+        try {
+          const res = await fetch("/api/ask", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({prompt})
+          });
+
+          const data = await res.json();
+
+          if (res.ok) {
+            responseText.textContent = data.completion;
+            responseContainer.classList.remove("hidden");
+          } else {
+            // Handle validation errors (list of errors) or string errors
+            if (Array.isArray(data.error)) {
+              errorText.textContent = data.error.map(err => err.msg).join(", ");
+            } else {
+              errorText.textContent = data.error;
+            }
+            errorContainer.classList.remove("hidden");
+          }
+        } catch (err) {
+          errorText.textContent = "An unexpected error occurred.";
+          errorContainer.classList.remove("hidden");
+        }
+      });
+    </script>
+</body>
+</html>
