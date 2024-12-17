@@ -15,7 +15,7 @@ This repository contains a sample Flask web application that demonstrates integr
 2. **Create the Workspace**:  
    Use Daytona to clone and set up this sample repository:  
    ```bash  
-   daytona create https://github.com/sayantan007pal/Daytona-Pydantic-ai-App.git  
+   daytona create https://github.com/palsayantan007/Daytona-Pydantic-ai-App 
    ```  
 
 3. **Set Up Environment Variables**:  
